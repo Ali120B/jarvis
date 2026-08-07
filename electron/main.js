@@ -22,6 +22,19 @@ let mainWindow = null;
 let backendProcess = null;
 let backendUrl = null;
 
+// Only one instance allowed: launching the app again (double click, updater)
+// focuses the existing window instead of spawning a second backend.
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 function resolveBackendCommand() {
   if (app.isPackaged) {
     const exe = process.platform === 'win32' ? 'jarvis-backend.exe' : 'jarvis-backend';

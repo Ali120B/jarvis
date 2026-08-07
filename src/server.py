@@ -15,9 +15,10 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import jarvis_core as core
-import config as app_config
 
-CONFIG = app_config.AppConfig()
+# Single source of truth: core owns the config; server must share that same
+# instance or saves from the UI would never reach the chat/tools layer.
+CONFIG = core.CONFIG
 
 app = FastAPI(title="JARVIS Backend")
 
