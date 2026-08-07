@@ -77,6 +77,9 @@ function startBackend() {
     if (m) {
       backendUrl = `http://127.0.0.1:${m[1]}`;
       console.log('Backend ready at', backendUrl);
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('backend:url', backendUrl);
+      }
     }
   };
   backendProcess.stdout.on('data', onOutput);
@@ -85,6 +88,10 @@ function startBackend() {
   backendProcess.on('exit', (code) => {
     console.log('Backend exited:', code);
     backendProcess = null;
+    backendUrl = null;
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('backend:url', null);
+    }
   });
 }
 
@@ -218,4 +225,4 @@ ipcMain.handle('window:focus', () => {
   if (mainWindow) mainWindow.focus();
 });
 
-ipcMain.handle('get-backend-url', () => backendUrl || `http://127.0.0.1:${DEV_BACKEND_PORT}`);
+ipcMain.handle('get-backend-url', () => backendUrl);

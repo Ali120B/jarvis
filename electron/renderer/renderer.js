@@ -1,70 +1,73 @@
 const backend = {
-  async url() {
-    if (!this._url) {
-      if (window.jarvis) {
-        this._url = await window.jarvis.getBackendUrl();
-      } else {
-        this._url = window.location.origin;
-      }
+  async url(force) {
+    if (!force && this._url) return this._url;
+    if (window.jarvis) {
+      const u = await window.jarvis.getBackendUrl();
+      if (u) this._url = u;
+    } else {
+      this._url = window.location.origin;
     }
-    return this._url;
+    return this._url || null;
+  },
+  // fetch wrapper: on network failure invalidate the cached URL, re-query the
+  // real backend URL and retry once (covers the backend announcing its port
+  // after the renderer already cached a stale/fallback URL)
+  async _req(path, opts, retry) {
+    const base = await this.url();
+    if (!base) throw new Error('Backend not ready');
+    try {
+      const res = await fetch(`${base}${path}`, opts);
+      if (!res.ok) throw new Error(`Backend error ${res.status}`);
+      return res;
+    } catch (e) {
+      if (retry) {
+        this._url = null;
+        const base2 = await this.url();
+        if (base2 && base2 !== base) return this._req(path, opts, false);
+      }
+      throw e;
+    }
   },
   async chat(text) {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/chat`, {
+    const res = await this._req('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, tts: true })
-    });
-    if (!res.ok) throw new Error(`Backend error ${res.status}`);
+    }, true);
     return res.json();
   },
   async status() {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/status`);
-    if (!res.ok) throw new Error('status');
+    const res = await this._req('/api/status', {}, true);
     return res.json();
   },
   async clear() {
-    const base = await this.url();
-    await fetch(`${base}/api/clear`, { method: 'POST' });
+    await this._req('/api/clear', { method: 'POST' }, true);
   },
   async listen() {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/listen`, { method: 'POST' });
-    if (!res.ok) throw new Error(`Backend error ${res.status}`);
+    const res = await this._req('/api/listen', { method: 'POST' }, true);
     return res.json();
   },
   async stopListen() {
-    const base = await this.url();
-    await fetch(`${base}/api/listen/stop`, { method: 'POST' }).catch(() => {});
+    await this._req('/api/listen/stop', { method: 'POST' }, true).catch(() => {});
   },
   async health() {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/health`);
-    if (!res.ok) throw new Error('health');
+    const res = await this._req('/api/health', {}, true);
     return res.json();
   },
   async config() {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/config`);
-    if (!res.ok) throw new Error('config');
+    const res = await this._req('/api/config', {}, true);
     return res.json();
   },
   async saveConfig(payload) {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/config`, {
+    const res = await this._req('/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    });
-    if (!res.ok) throw new Error(`Config error ${res.status}`);
+    }, true);
     return res.json();
   },
   async models(provider) {
-    const base = await this.url();
-    const res = await fetch(`${base}/api/models?provider=${encodeURIComponent(provider)}`);
-    if (!res.ok) throw new Error('models');
+    const res = await this._req(`/api/models?provider=${encodeURIComponent(provider)}`, {}, true);
     return res.json();
   }
 };
@@ -445,5 +448,10 @@ if (window.jarvis) {
   window.jarvis.onUpdateDownloaded((v) => {
     updateState.classList.remove('hidden');
     updateText.textContent = 'READY - CLOSE TO INSTALL';
+  });
+  window.jarvis.onBackendUrl((u) => {
+    if (u === backend._url) return;
+    backend._url = u;
+    pollStatus();
   });
 }
