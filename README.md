@@ -62,6 +62,21 @@ cd electron && npm install && npm run dist
 
 Output: `electron/dist/`.
 
+### Release / publish (one command)
+
+```bash
+cd electron
+npm run publish
+```
+
+This compiles the backend, builds the native installer (AppImage on Linux,
+NSIS .exe on Windows), tags the release (`v<version>`), pushes the tag, and
+drafts a GitHub release with the installer attached.
+
+On Linux, the Windows installer is built automatically by GitHub Actions
+(`.github/workflows/build-windows.yml`) on a real Windows runner and attached to
+the same draft release. Requires the `gh` CLI to be authenticated.
+
 ## API key note
 
 Never commit a real API key. `src/config.py` reads everything from the user config
