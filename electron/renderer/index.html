@@ -62,6 +62,7 @@
       <span id="sysinfo">SYS&nbsp;NOMINAL &middot; ALL&nbsp;SYSTEMS&nbsp;GO</span>
       <span class="footer-right">
         <span id="backend-state">BACKEND: &nbsp;<b id="backend-text">OFFLINE</b></span>
+        <span id="update-state" class="hidden" title="Software update">UPDATE: <b id="update-text"></b></span>
         <button id="btn-settings" class="hud-btn gear-btn" title="Settings">&#9881;</button>
       </span>
     </div>
@@ -94,11 +95,13 @@
       </div>
       <div class="form-row" id="cfg-model-row-groq">
         <label for="cfg-model">MODEL</label>
-        <select id="cfg-model"></select>
+        <input id="cfg-model" list="cfg-model-list" placeholder="type or pick a model" autocomplete="off" spellcheck="false">
+        <datalist id="cfg-model-list"></datalist>
       </div>
       <div class="form-row hidden" id="cfg-model-row-openrouter">
         <label for="cfg-model-or">MODEL&nbsp;(OPENROUTER)</label>
-        <select id="cfg-model-or"></select>
+        <input id="cfg-model-or" list="cfg-model-or-list" placeholder="type or pick a model" autocomplete="off" spellcheck="false">
+        <datalist id="cfg-model-or-list"></datalist>
       </div>
       <div class="modal-actions">
         <span id="cfg-status" class="modal-status"></span>

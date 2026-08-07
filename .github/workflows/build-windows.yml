@@ -48,3 +48,4 @@ jobs:
           files: |
             electron/dist/*.exe
             electron/dist/*.blockmap
+            electron/dist/latest.yml

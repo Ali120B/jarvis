@@ -1,7 +1,7 @@
 {
   "name": "jarvis",
   "productName": "JARVIS",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "description": "JARVIS - AI voice assistant HUD (Electron UI + Python backend)",
   "main": "main.js",
   "author": "JARVIS Project",
@@ -23,6 +23,13 @@
     "asar": true,
     "compression": "maximum",
     "npmRebuild": false,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ali120B",
+        "repo": "jarvis"
+      }
+    ],
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -71,5 +78,8 @@
   "allowScripts": {
     "electron@33.4.11": true,
     "electron-builder": true
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
   }
 }

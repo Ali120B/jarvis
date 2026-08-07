@@ -74,9 +74,10 @@ function main() {
 
   // --- 4. draft release + upload local artifacts ---
   const distDir = path.join(ELECTRON, 'dist');
-  const pattern = process.platform === 'win32' ? '*.exe' : '*.AppImage';
-  const files = fs.readdirSync(distDir).filter((f) => f.endsWith(pattern.replace('*', '')));
-  if (!files.length) {
+  // installers + auto-update metadata (latest*.yml, *.blockmap)
+  const RELEVANT = /\.(exe|AppImage|blockmap)$|^latest(-linux|-mac)?\.yml$/;
+  const files = fs.readdirSync(distDir).filter((f) => RELEVANT.test(f));
+  if (!files.some((f) => /\.(exe|AppImage)$/.test(f))) {
     console.error('[ERROR] no installer artifact found in electron/dist');
     process.exit(1);
   }

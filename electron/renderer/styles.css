@@ -652,3 +652,30 @@ body {
 }
 
 .modal-status.error { color: var(--red); }
+
+/* typable model inputs (same look as the selects) */
+.form-row input[type="text"] {
+  flex: 1;
+  background: rgba(6, 12, 30, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 7px 9px;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.form-row input[type="text"]:focus {
+  border-color: var(--cyan-soft);
+  box-shadow: 0 0 12px rgba(0,210,255,.2);
+}
+
+/* auto-update status in footer */
+#update-state {
+  color: var(--cyan);
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0,210,255,.4);
+}
+
+#update-state.hidden { display: none; }

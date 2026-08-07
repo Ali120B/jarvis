@@ -355,21 +355,18 @@ async function onProviderChange(provider, cfg) {
   modelRowGroq.classList.toggle('hidden', isOr);
   modelRowOr.classList.toggle('hidden', !isOr);
   const target = isOr ? cfgModelOr : cfgModel;
-  target.innerHTML = '';
+  const list = isOr ? $('cfg-model-or-list') : $('cfg-model-list');
+  list.innerHTML = '';
+  target.value = '';
   try {
     const { models } = await backend.models(provider);
     for (const m of models) {
       const opt = document.createElement('option');
       opt.value = m.id;
-      opt.textContent = m.name;
-      target.appendChild(opt);
+      list.appendChild(opt);
     }
   } catch {
-    const saved = isOr ? 'openai/gpt-4o-mini' : 'llama-3.3-70b-versatile';
-    const opt = document.createElement('option');
-    opt.value = saved;
-    opt.textContent = saved;
-    target.appendChild(opt);
+    /* datalist stays empty; typing a model id still works */
   }
   if (cfg) {
     const saved = isOr ? cfg.openrouter_model : cfg.model;
@@ -400,8 +397,8 @@ $('btn-settings-save').addEventListener('click', async () => {
   const payload = {
     provider: cfgProvider.value,
     api_key: key,
-    model: cfgModel.value,
-    openrouter_model: cfgModelOr.value
+    model: cfgModel.value.trim(),
+    openrouter_model: cfgModelOr.value.trim()
   };
   cfgStatus.textContent = 'SAVING...';
   cfgStatus.className = 'modal-status';
@@ -429,4 +426,24 @@ async function checkFirstRun() {
       appendMessage('sys', 'CONFIGURATION REQUIRED - SET YOUR API KEY');
     }
   } catch { /* backend not ready yet; poll will retry */ }
+}
+
+/* ---------------- auto-update status (footer) ---------------- */
+
+const updateState = $('update-state');
+const updateText = $('update-text');
+
+if (window.jarvis) {
+  window.jarvis.onUpdateAvailable((v) => {
+    updateState.classList.remove('hidden');
+    updateText.textContent = `v${v} AVAILABLE`;
+  });
+  window.jarvis.onUpdateProgress((p) => {
+    updateState.classList.remove('hidden');
+    updateText.textContent = `DOWNLOADING ${p}%`;
+  });
+  window.jarvis.onUpdateDownloaded((v) => {
+    updateState.classList.remove('hidden');
+    updateText.textContent = 'READY - CLOSE TO INSTALL';
+  });
 }
