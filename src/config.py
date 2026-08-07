@@ -1,0 +1,119 @@
+"""User configuration storage.
+
+The API key, provider and model are stored OUTSIDE the app bundle so they are
+never baked into the code or the packaged exe. Location:
+  - Linux:   ~/.config/jarvis/config.json
+  - Windows: %APPDATA%/Jarvis/config.json
+"""
+
+import json
+import os
+import sys
+
+APP_NAME = "jarvis"
+
+DEFAULT_CONFIG = {
+    "provider": "groq",          # "groq" | "openrouter"
+    "api_key": "",
+    "model": "llama-3.3-70b-versatile",       # Groq model
+    "openrouter_model": "openai/gpt-4o-mini", # OpenRouter model
+    "vision_model": "qwen/qwen3.6-27b",       # Groq vision model
+    "openrouter_vision": "qwen/qwen2.5-vl-72b-instruct",  # OpenRouter vision
+}
+
+GROQ_MODELS = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "llama-3.1-70b-versatile",
+    "qwen/qwen3-32b",
+    "qwen/qwen3-27b",
+    "qwen/qwen3.6-27b",
+    "gemma2-9b-it",
+    "mixtral-8x7b-32768",
+]
+
+OPENROUTER_FALLBACK_MODELS = [
+    "openai/gpt-4o-mini",
+    "openai/gpt-4o",
+    "anthropic/claude-3.5-haiku",
+    "anthropic/claude-3.5-sonnet",
+    "meta-llama/llama-3.3-70b-instruct",
+    "deepseek/deepseek-chat",
+    "qwen/qwen-2.5-72b-instruct",
+    "mistralai/mistral-small-24b-instruct",
+]
+
+
+def config_dir() -> str:
+    if sys.platform.startswith("win"):
+        base = os.environ.get("APPDATA") or os.path.expanduser("~")
+        return os.path.join(base, "Jarvis")
+    base = os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config")
+    return os.path.join(base, APP_NAME)
+
+
+class AppConfig:
+    def __init__(self):
+        self.path = os.path.join(config_dir(), "config.json")
+        self.data = dict(DEFAULT_CONFIG)
+        self.load()
+
+    def load(self):
+        try:
+            with open(self.path, "r", encoding="utf-8") as f:
+                stored = json.load(f)
+            if isinstance(stored, dict):
+                self.data.update(stored)
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            print(f"⚠️ Config load failed: {e}")
+
+    def save(self):
+        try:
+            os.makedirs(os.path.dirname(self.path), exist_ok=True)
+            with open(self.path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+            try:
+                os.chmod(self.path, 0o600)
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"⚠️ Config save failed: {e}")
+
+    def is_configured(self) -> bool:
+        return bool(self.data.get("api_key", "").strip())
+
+    def provider(self) -> str:
+        return self.data.get("provider", "groq")
+
+    def active_model(self) -> str:
+        if self.provider() == "openrouter":
+            return self.data.get("openrouter_model") or DEFAULT_CONFIG["openrouter_model"]
+        return self.data.get("model") or DEFAULT_CONFIG["model"]
+
+    def active_vision_model(self) -> str:
+        if self.provider() == "openrouter":
+            return self.data.get("openrouter_vision") or DEFAULT_CONFIG["openrouter_vision"]
+        return self.data.get("vision_model") or DEFAULT_CONFIG["vision_model"]
+
+    def update(self, provider=None, api_key=None, model=None, openrouter_model=None) -> dict:
+        if provider in ("groq", "openrouter"):
+            self.data["provider"] = provider
+        if api_key is not None:
+            self.data["api_key"] = api_key.strip()
+        if model:
+            self.data["model"] = model
+        if openrouter_model is not None:
+            self.data["openrouter_model"] = openrouter_model
+        self.save()
+        return self.public()
+
+    def public(self) -> dict:
+        """No secrets here - safe to send to the UI."""
+        return {
+            "configured": self.is_configured(),
+            "provider": self.provider(),
+            "model": self.data.get("model", ""),
+            "openrouter_model": self.data.get("openrouter_model", ""),
+        }

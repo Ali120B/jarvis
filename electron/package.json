@@ -1,0 +1,74 @@
+{
+  "name": "jarvis",
+  "productName": "JARVIS",
+  "version": "1.0.0",
+  "description": "JARVIS - AI voice assistant HUD (Electron UI + Python backend)",
+  "main": "main.js",
+  "author": "JARVIS Project",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win nsis",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.jarvis.assistant",
+    "productName": "JARVIS",
+    "asar": true,
+    "compression": "maximum",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/backend",
+        "to": "backend",
+        "filter": [
+          "jarvis-backend",
+          "jarvis-backend.exe"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "JARVIS",
+      "runAfterFinish": true
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    }
+  },
+  "allowScripts": {
+    "electron@33.4.11": true,
+    "electron-builder": true
+  }
+}

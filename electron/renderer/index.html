@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src http://127.0.0.1:* http://localhost:*; media-src http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>J.A.R.V.I.S.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="grid-overlay"></div>
+  <div id="scanline"></div>
+  <div id="particles"></div>
+
+  <div id="app">
+    <div id="titlebar">
+      <div class="titlebar-left">
+        <span class="pulse-dot" id="core-dot"></span>
+        <span id="title">J.A.R.V.I.S.</span>
+        <span id="subtitle">Mark&nbsp;VII &middot; Uplink&nbsp;Secure</span>
+      </div>
+      <div class="titlebar-right">
+        <span id="clock">00:00:00</span>
+        <button id="btn-clear" class="hud-btn" title="Clear conversation">CLEAR</button>
+        <button id="btn-minimize" class="win-btn" title="Minimize">&#8722;</button>
+        <button id="btn-close" class="win-btn" title="Close">&#10005;</button>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="hud-core">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+        <div class="core-glow"></div>
+        <div class="core-orb" id="core-orb">
+          <div class="core-inner"></div>
+        </div>
+        <div class="ring-sweep"></div>
+        <div id="status-label">STANDBY</div>
+      </div>
+
+      <div id="right-panel">
+        <div id="task-banner" class="hidden">
+          <div class="banner-icon" id="banner-icon">&#9881;</div>
+          <div class="banner-body">
+            <div class="banner-title" id="banner-title">EXECUTING</div>
+            <div class="banner-text" id="banner-text">Initializing...</div>
+          </div>
+        </div>
+
+        <div id="chat-log"></div>
+
+        <div id="input-row">
+          <button id="btn-mic" class="hud-btn icon-btn" title="Voice input">&#127908;</button>
+          <input id="text-input" type="text" placeholder="&#9654; GIVE A COMMAND, BOSS..." autocomplete="off" spellcheck="false">
+          <button id="btn-send" class="hud-btn icon-btn accent" title="Send">&#9654;</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer">
+      <span id="sysinfo">SYS&nbsp;NOMINAL &middot; ALL&nbsp;SYSTEMS&nbsp;GO</span>
+      <span class="footer-right">
+        <span id="backend-state">BACKEND: &nbsp;<b id="backend-text">OFFLINE</b></span>
+        <button id="btn-settings" class="hud-btn gear-btn" title="Settings">&#9881;</button>
+      </span>
+    </div>
+  </div>
+
+  <!-- settings / first-run setup modal (custom, not window.alert) -->
+  <div id="settings-overlay" class="hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">JARVIS&nbsp;&middot;&nbsp;CONFIGURATION</span>
+        <button id="btn-settings-close" class="win-btn" title="Close">&#10005;</button>
+      </div>
+      <p id="settings-hint" class="modal-hint">
+        No API key detected. Provide a provider and API key to activate JARVIS.
+        Your key is stored locally and never bundled with the app.
+      </p>
+      <div class="form-row">
+        <label for="cfg-provider">PROVIDER</label>
+        <select id="cfg-provider">
+          <option value="groq">Groq</option>
+          <option value="openrouter">OpenRouter</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label for="cfg-key">API&nbsp;KEY</label>
+        <div class="key-row">
+          <input id="cfg-key" type="password" placeholder="sk-..." autocomplete="off" spellcheck="false">
+          <button id="cfg-key-toggle" class="hud-btn icon-btn" title="Show / hide">&#128065;</button>
+        </div>
+      </div>
+      <div class="form-row" id="cfg-model-row-groq">
+        <label for="cfg-model">MODEL</label>
+        <select id="cfg-model"></select>
+      </div>
+      <div class="form-row hidden" id="cfg-model-row-openrouter">
+        <label for="cfg-model-or">MODEL&nbsp;(OPENROUTER)</label>
+        <select id="cfg-model-or"></select>
+      </div>
+      <div class="modal-actions">
+        <span id="cfg-status" class="modal-status"></span>
+        <button id="btn-settings-save" class="hud-btn accent">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

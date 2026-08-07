@@ -1,0 +1,31 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# --- Runtime artifacts ---
+src/audio/*.mp3
+src/audio/*.png
+*.log
+/tmp/
+
+# --- Electron / Node ---
+electron/node_modules/
+electron/dist/
+electron/resources/backend/
+electron/resources/*.exe
+electron/resources/jarvis-backend*
+dist/
+build/
+
+# --- User secrets ---
+*.key
+.env
+# config.json lives in the user's config dir (~/.config/jarvis) - never commit
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
