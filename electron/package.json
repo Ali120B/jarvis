@@ -1,7 +1,7 @@
 {
   "name": "jarvis",
   "productName": "JARVIS",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "JARVIS - AI voice assistant HUD (Electron UI + Python backend)",
   "main": "main.js",
   "author": "JARVIS Project",

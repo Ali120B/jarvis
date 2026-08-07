@@ -27,7 +27,7 @@ const VENV_PY = process.platform === 'win32'
   : path.join(ROOT, 'venv', 'bin', 'python');
 
 function sh(cmd, cwd = ROOT) {
-  console.log(`\n▶ ${cmd}`);
+  console.log(`\n>> ${cmd}`);
   execSync(cmd, { cwd, stdio: 'inherit', shell: true });
 }
 
@@ -43,18 +43,18 @@ function check(cmd) {
 function main() {
   // --- preflight ---
   if (!check('gh auth status')) {
-    console.error('✖ gh CLI not authenticated. Run: gh auth login');
+    console.error('[ERROR] gh CLI not authenticated. Run: gh auth login');
     process.exit(1);
   }
   if (!fs.existsSync(VENV_PY)) {
-    console.error(`✖ venv not found at ${VENV_PY}. Create it first (see README).`);
+    console.error(`[ERROR] venv not found at ${VENV_PY}. Create it first (see README).`);
     process.exit(1);
   }
 
   const pkg = JSON.parse(fs.readFileSync(path.join(ELECTRON, 'package.json'), 'utf8'));
   const version = pkg.version;
   const tag = `v${version}`;
-  console.log(`\n⚡ JARVIS publish ${version} on ${process.platform}`);
+  console.log(`\n[STEP] JARVIS publish ${version} on ${process.platform}`);
 
   // --- 1. backend binary ---
   sh(`${JSON.stringify(VENV_PY)} scripts/build_backend.py`);
@@ -77,7 +77,7 @@ function main() {
   const pattern = process.platform === 'win32' ? '*.exe' : '*.AppImage';
   const files = fs.readdirSync(distDir).filter((f) => f.endsWith(pattern.replace('*', '')));
   if (!files.length) {
-    console.error('✖ no installer artifact found in electron/dist');
+    console.error('[ERROR] no installer artifact found in electron/dist');
     process.exit(1);
   }
 
@@ -89,7 +89,7 @@ function main() {
     sh(`gh release upload ${tag} ${JSON.stringify(path.join(distDir, f))} --clobber`);
   }
 
-  console.log(`\n✅ Draft release ready: https://github.com/${process.env.GITHUB_REPOSITORY || 'your-org/jarvis'}/releases/tag/${tag}`);
+  console.log(`\n[OK] Draft release ready: https://github.com/${process.env.GITHUB_REPOSITORY || 'your-org/jarvis'}/releases/tag/${tag}`);
   console.log('   GitHub Actions is building the Windows installer in the background; it will be attached automatically.');
 }
 

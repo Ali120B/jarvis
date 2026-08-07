@@ -51,7 +51,10 @@ function startBackend() {
     backendUrl = `http://127.0.0.1:${DEV_BACKEND_PORT}`;
     return;
   }
-  backendProcess = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+  backendProcess = spawn(cmd, args, {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' }
+  });
 
   const onOutput = (buf) => {
     const text = buf.toString();
