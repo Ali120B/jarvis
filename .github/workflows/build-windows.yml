@@ -39,7 +39,7 @@ jobs:
 
       - name: Build NSIS installer
         working-directory: electron
-        run: npx electron-builder --win nsis
+        run: npx electron-builder --win nsis --publish never
 
       - name: Attach installer to release
         uses: softprops/action-gh-release@v2

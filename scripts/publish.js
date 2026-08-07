@@ -59,10 +59,10 @@ function main() {
   // --- 1. backend binary ---
   sh(`${JSON.stringify(VENV_PY)} scripts/build_backend.py`);
 
-  // --- 2. installer for the current OS ---
+  // --- 2. installer for the current OS (never auto-publish; gh CLI uploads) ---
   const targets = process.platform === 'win32'
-    ? ['--win', 'nsis']
-    : ['--linux', 'AppImage'];
+    ? ['--win', 'nsis', '--publish', 'never']
+    : ['--linux', 'AppImage', '--publish', 'never'];
   sh(`npx electron-builder ${targets.join(' ')}`, ELECTRON);
 
   // --- 3. tag + push (triggers CI for the Windows build on Linux machines) ---
