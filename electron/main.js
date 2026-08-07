@@ -4,6 +4,19 @@ const path = require('path');
 const fs = require('fs');
 const { autoUpdater } = require('electron-updater');
 
+// When launched from a file manager there is no terminal: stdout is a closed
+// pipe and any console.write throws EIO, which would crash the main process.
+for (const level of ['log', 'warn', 'error']) {
+  const orig = console[level].bind(console);
+  console[level] = (...args) => {
+    try {
+      orig(...args);
+    } catch (e) {
+      /* ignore EIO: no console available */
+    }
+  };
+}
+
 const DEV_BACKEND_PORT = 8765;
 let mainWindow = null;
 let backendProcess = null;

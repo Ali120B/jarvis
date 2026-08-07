@@ -551,6 +551,8 @@ body {
   z-index: 100;
 }
 
+.hidden { display: none !important; }
+
 #settings-overlay.hidden { display: none; }
 
 .modal {

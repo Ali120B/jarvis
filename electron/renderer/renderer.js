@@ -409,7 +409,7 @@ $('btn-settings-save').addEventListener('click', async () => {
     appendMessage('sys', 'CONFIG UPDATED. JARVIS ACTIVATED.');
     setTimeout(closeSettings, 700);
   } catch (e) {
-    cfgStatus.textContent = 'SAVE FAILED';
+    cfgStatus.textContent = 'SAVE FAILED: ' + e.message;
     cfgStatus.className = 'modal-status error';
   }
 });
